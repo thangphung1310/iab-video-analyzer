@@ -21,8 +21,7 @@ ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Build Next.js application
-RUN next build --no-lint
+RUN npm run build --no-lint
 
 # Production image
 FROM base AS runner

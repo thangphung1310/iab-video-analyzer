@@ -38,3 +38,8 @@ next-env.d.ts
 .next
 server/uploads/
 out
+
+certbot/conf/
+certbot/www/
+*.bak
+renew-certs.sh
