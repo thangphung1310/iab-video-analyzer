@@ -29,6 +29,8 @@ echo -e "${GREEN}🔧 Configuring domain settings...${NC}"
 sed -i.bak "s/yourdomain.com/$DOMAIN/g" docker-compose.production.yml
 sed -i.bak "s/your-email@example.com/$EMAIL/g" docker-compose.production.yml
 
+
+
 # Update nginx configuration with actual domain
 sed -i.bak "s/yourdomain.com/$DOMAIN/g" nginx/conf.d/default.conf
 sed -i.bak "s/yourdomain.com/$DOMAIN/g" nginx/conf.d/default.conf.http-only
@@ -113,6 +115,16 @@ if [[ "${USE_SSL:-true}" == "true" ]]; then
         exit 1
     fi
 fi
+
+# Update the frontend build args with the correct API URL based on SSL availability
+echo -e "${GREEN}🔧 Configuring frontend API URL...${NC}"
+if [[ "${USE_SSL:-true}" == "true" ]]; then
+    API_BASE_URL="https://api.$DOMAIN"
+else
+    API_BASE_URL="http://api.$DOMAIN"
+fi
+sed -i.bak "s|NEXT_PUBLIC_API_URL=https://api.yourdomain.com|NEXT_PUBLIC_API_URL=$API_BASE_URL|g" docker-compose.production.yml
+echo "Frontend will use API URL: $API_BASE_URL"
 
 # Create the complete configuration (with or without SSL)
 if [[ "${USE_SSL:-true}" == "true" ]]; then
