@@ -61,7 +61,7 @@ echo -e "${GREEN}🔒 Setting up SSL certificates...${NC}"
 echo "Starting nginx for initial certificate request..."
 
 # Start nginx without SSL first
-docker-compose -f docker-compose.production.yml up -d nginx
+docker compose -f docker-compose.production.yml up -d nginx
 
 # Wait for nginx to be ready
 sleep 10
@@ -77,11 +77,11 @@ docker run --rm -it \
     -d $DOMAIN -d api.$DOMAIN
 
 # Stop nginx
-docker-compose -f docker-compose.production.yml down
+docker compose -f docker-compose.production.yml down
 
 # Start all services
 echo -e "${GREEN}🚀 Starting all services...${NC}"
-docker-compose -f docker-compose.production.yml up -d
+docker compose -f docker-compose.production.yml up -d
 
 # Setup certificate renewal cron job
 echo -e "${GREEN}⏰ Setting up certificate auto-renewal...${NC}"
@@ -93,7 +93,7 @@ docker run --rm -it \
     certbot/certbot:latest \
     renew --webroot --webroot-path=/var/www/certbot/
 
-docker-compose -f docker-compose.production.yml exec nginx nginx -s reload
+docker compose -f docker-compose.production.yml exec nginx nginx -s reload
 EOF
 
 chmod +x renew-certs.sh
@@ -111,5 +111,5 @@ echo "   Frontend: https://$DOMAIN"
 echo "   API: https://api.$DOMAIN"
 echo
 echo -e "${YELLOW}🔍 To check status:${NC}"
-echo "   docker-compose -f docker-compose.production.yml ps"
-echo "   docker-compose -f docker-compose.production.yml logs -f" 
+echo "   docker compose -f docker-compose.production.yml ps"
+echo "   docker compose -f docker-compose.production.yml logs -f" 
