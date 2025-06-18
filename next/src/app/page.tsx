@@ -22,6 +22,9 @@ export default function VideoUploadPage() {
   
   const router = useRouter()
 
+  // API URL configuration
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault()
     setIsDragOver(true)
@@ -144,7 +147,7 @@ export default function VideoUploadPage() {
         })
       }, 150)
 
-      const response = await fetch('http://localhost:3001/api/upload', {
+      const response = await fetch(`${API_URL}/api/upload`, {
         method: 'POST',
         body: formData,
         mode: 'cors',
@@ -203,7 +206,7 @@ export default function VideoUploadPage() {
   // Check server status
   const checkServerStatus = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/health', {
+      const response = await fetch(`${API_URL}/api/health`, {
         method: 'GET',
         mode: 'cors',
       })
@@ -389,7 +392,7 @@ export default function VideoUploadPage() {
                         variant="outline"
                         onClick={async () => {
                           try {
-                            const response = await fetch('http://localhost:3001/api/health', {
+                            const response = await fetch(`${API_URL}/api/health`, {
                               method: 'GET',
                               mode: 'cors',
                             })
