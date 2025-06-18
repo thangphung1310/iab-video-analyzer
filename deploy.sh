@@ -8,9 +8,6 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-echo -e "${GREEN}🚀 IAB Video Analyzer Production Deployment${NC}"
-echo
-
 # Check if required files exist
 if [[ ! -f "docker-compose.production.yml" ]]; then
     echo -e "${RED}❌ docker-compose.production.yml not found${NC}"
@@ -61,8 +58,9 @@ mkdir -p certbot/www
 echo -e "${GREEN}🔒 Setting up SSL certificates...${NC}"
 echo "Starting nginx with HTTP-only configuration for certificate validation..."
 
-# Backup the full SSL config and use HTTP-only config temporarily
-cp nginx/conf.d/default.conf nginx/conf.d/default.conf.ssl
+# Create a backup of the SSL config with a proper name
+cp nginx/conf.d/default.conf nginx/conf.d/default.conf.backup
+# Switch to HTTP-only config for certificate validation
 cp nginx/conf.d/default.conf.http-only nginx/conf.d/default.conf
 
 # Start nginx with HTTP-only config
@@ -81,16 +79,22 @@ docker run --rm -it \
     --email $EMAIL --agree-tos --no-eff-email \
     -d $DOMAIN -d api.$DOMAIN
 
-# Restore the full SSL config
+# Restore the full SSL config from backup
 echo -e "${GREEN}🔧 Enabling SSL configuration...${NC}"
-cp nginx/conf.d/default.conf.ssl nginx/conf.d/default.conf
+cp nginx/conf.d/default.conf.backup nginx/conf.d/default.conf
 
-# Stop nginx
-docker compose -f docker-compose.production.yml down
+# Reload nginx with new SSL configuration
+echo "Reloading nginx with SSL configuration..."
+docker compose -f docker-compose.production.yml exec nginx nginx -s reload
 
-# Start all services
-echo -e "${GREEN}🚀 Starting all services with SSL...${NC}"
+# Start remaining services if not already running
+echo -e "${GREEN}🚀 Starting all services...${NC}"
 docker compose -f docker-compose.production.yml up -d
+
+# Verify services are running
+echo -e "${GREEN}🔍 Checking service status...${NC}"
+sleep 5
+docker compose -f docker-compose.production.yml ps
 
 # Setup certificate renewal cron job
 echo -e "${GREEN}⏰ Setting up certificate auto-renewal...${NC}"
