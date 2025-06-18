@@ -36,7 +36,6 @@ services:
       - "3000"
     environment:
       - NODE_ENV=production
-      - NEXT_PUBLIC_API_URL=https://api.yourdomain.com
     env_file:
       - ./next/.env.production
     depends_on:
