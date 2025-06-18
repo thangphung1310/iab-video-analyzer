@@ -1,0 +1,18 @@
+# Rate limiting
+limit_req_zone $binary_remote_addr zone=general:10m rate=10r/s;
+
+# HTTP server - for Let's Encrypt validation and redirects
+server {
+    listen 80;
+    server_name iab-video-analyzer.site api.iab-video-analyzer.site;
+
+    # Let's Encrypt challenges
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    # Redirect all other traffic to HTTPS (will be enabled after SSL setup)
+    location / {
+        return 301 https://$host$request_uri;
+    }
+} 

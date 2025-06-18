@@ -34,6 +34,7 @@ sed -i.bak "s/your-email@example.com/$EMAIL/g" docker-compose.production.yml
 
 # Update nginx configuration with actual domain
 sed -i.bak "s/yourdomain.com/$DOMAIN/g" nginx/conf.d/default.conf
+sed -i.bak "s/yourdomain.com/$DOMAIN/g" nginx/conf.d/default.conf.http-only
 
 # Create environment files if they don't exist
 echo -e "${GREEN}📄 Setting up environment files...${NC}"
@@ -58,9 +59,13 @@ mkdir -p certbot/www
 
 # Initial SSL certificate setup (dry run first)
 echo -e "${GREEN}🔒 Setting up SSL certificates...${NC}"
-echo "Starting nginx for initial certificate request..."
+echo "Starting nginx with HTTP-only configuration for certificate validation..."
 
-# Start nginx without SSL first
+# Backup the full SSL config and use HTTP-only config temporarily
+cp nginx/conf.d/default.conf nginx/conf.d/default.conf.ssl
+cp nginx/conf.d/default.conf.http-only nginx/conf.d/default.conf
+
+# Start nginx with HTTP-only config
 docker compose -f docker-compose.production.yml up -d nginx
 
 # Wait for nginx to be ready
@@ -76,11 +81,15 @@ docker run --rm -it \
     --email $EMAIL --agree-tos --no-eff-email \
     -d $DOMAIN -d api.$DOMAIN
 
+# Restore the full SSL config
+echo -e "${GREEN}🔧 Enabling SSL configuration...${NC}"
+cp nginx/conf.d/default.conf.ssl nginx/conf.d/default.conf
+
 # Stop nginx
 docker compose -f docker-compose.production.yml down
 
 # Start all services
-echo -e "${GREEN}🚀 Starting all services...${NC}"
+echo -e "${GREEN}🚀 Starting all services with SSL...${NC}"
 docker compose -f docker-compose.production.yml up -d
 
 # Setup certificate renewal cron job
