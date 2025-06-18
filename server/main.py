@@ -1452,7 +1452,7 @@ async def process_video_async(video_path: Path, upload_id: str, original_name: s
                 "method": "openai-whisper-local"
             }
             print(f"💬 Local transcription included in metadata: {audio_result['transcription']['word_count']} words")
-
+        
         updated_metadata = {
             **current_metadata,
             "videoInfo": video_info,

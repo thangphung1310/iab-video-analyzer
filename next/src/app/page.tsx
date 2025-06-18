@@ -99,7 +99,7 @@ export default function VideoUploadPage() {
     if (videoFile) {
       const validation = await validateFile(videoFile)
       if (validation.valid) {
-        setSelectedFile(videoFile)
+      setSelectedFile(videoFile)
         setUploadError(null)
       } else {
         setUploadError(validation.error || 'Invalid file')
@@ -113,7 +113,7 @@ export default function VideoUploadPage() {
     if (file) {
       const validation = await validateFile(file)
       if (validation.valid) {
-        setSelectedFile(file)
+      setSelectedFile(file)
         setUploadError(null)
       } else {
         setUploadError(validation.error || 'Invalid file')
@@ -166,9 +166,9 @@ export default function VideoUploadPage() {
       setUploadId(result.uploadId)
 
       if (progressInterval) clearInterval(progressInterval)
-      setUploadProgress(100)
-      setIsUploading(false)
-      setUploadComplete(true)
+        setUploadProgress(100)
+        setIsUploading(false)
+        setUploadComplete(true)
       
       router.push(`/video/${result.uploadId}`)
 
@@ -309,11 +309,11 @@ export default function VideoUploadPage() {
                   </div>
 
                   <div className="space-y-3">
-                    <div className="flex flex-wrap justify-center gap-2 text-sm text-slate-500">
-                      <Badge variant="outline">MP4</Badge>
-                      <Badge variant="outline">MOV</Badge>
-                      <Badge variant="outline">AVI</Badge>
-                      <Badge variant="outline">WebM</Badge>
+                  <div className="flex flex-wrap justify-center gap-2 text-sm text-slate-500">
+                    <Badge variant="outline">MP4</Badge>
+                    <Badge variant="outline">MOV</Badge>
+                    <Badge variant="outline">AVI</Badge>
+                    <Badge variant="outline">WebM</Badge>
                     </div>
                     
                     <div className="text-xs text-slate-500 text-center space-y-1">
@@ -380,9 +380,9 @@ export default function VideoUploadPage() {
                 {uploadError && (
                   <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2 text-red-700">
-                        <AlertCircle className="w-5 h-5" />
-                        <span className="font-medium">Upload failed</span>
+                    <div className="flex items-center space-x-2 text-red-700">
+                      <AlertCircle className="w-5 h-5" />
+                      <span className="font-medium">Upload failed</span>
                       </div>
                       <Button
                         size="sm"

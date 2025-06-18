@@ -1,0 +1,87 @@
+version: '3.8'
+
+services:
+  # Video Upload Server with Python/FastAPI and FFmpeg
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: iab-video-analyzer-server-prod
+    expose:
+      - "3001"
+    volumes:
+      # Persist uploaded videos
+      - ./server/uploads:/app/uploads
+    environment:
+      - PORT=3001
+      - ENVIRONMENT=production
+    env_file:
+      - ./server/.env.production
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - iab-video-analyzer-network
+
+  frontend:
+    build:
+      context: ./next
+      dockerfile: Dockerfile
+    container_name: iab-video-analyzer-frontend-prod
+    expose:
+      - "3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=https://api.yourdomain.com
+    env_file:
+      - ./next/.env.production
+    depends_on:
+      server:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - iab-video-analyzer-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: iab-video-analyzer-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./certbot/www:/var/www/certbot/:ro
+      - ./certbot/conf/:/etc/nginx/ssl/:ro
+    restart: unless-stopped
+    depends_on:
+      - frontend
+      - server
+    networks:
+      - iab-video-analyzer-network
+
+  certbot:
+    image: certbot/certbot:latest
+    container_name: iab-video-analyzer-certbot
+    volumes:
+      - ./certbot/www/:/var/www/certbot/:rw
+      - ./certbot/conf/:/etc/letsencrypt/:rw
+    command: certonly --webroot --webroot-path=/var/www/certbot/ --email your-email@example.com --agree-tos --no-eff-email -d yourdomain.com -d api.yourdomain.com
+    depends_on:
+      - nginx
+
+networks:
+  iab-video-analyzer-network:
+    driver: bridge
+
+volumes:
+  uploads:
+    driver: local
+  certbot_conf:
+    driver: local
+  certbot_www:
+    driver: local 

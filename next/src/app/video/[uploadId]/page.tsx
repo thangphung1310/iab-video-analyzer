@@ -62,7 +62,7 @@ interface ProcessingResults {
     bitrate: string;
     sampleRate: string;
   };
-}
+  }
 
 interface IABCategory {
   iab_code: string;
@@ -190,7 +190,7 @@ export default function VideoViewPage() {
       
       // Check processing status
       await checkProcessingStatus();
-
+      
       // If processing is complete, fetch frames and transcription
       if (fileData.processing?.status === "completed") {
         await fetchFrames();
@@ -319,7 +319,7 @@ export default function VideoViewPage() {
 
   const retryAIAnalysis = async () => {
     if (retryingAnalysis) return;
-
+    
     setRetryingAnalysis(true);
     setRetryError(null); // Clear any previous retry errors
 
