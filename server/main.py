@@ -304,9 +304,19 @@ WEBHOOK_URL = os.getenv('WEBHOOK_URL')
 app = FastAPI(title="IAB Video Analyzer API", version="1.0.0")
 
 # CORS middleware
+allowed_origins = [
+    "http://localhost:3000", 
+    "http://127.0.0.1:3000",
+]
+
+allowed_origins_env = os.getenv('ALLOWED_ORIGINS', '')
+if allowed_origins_env:
+    production_origins = [origin.strip() for origin in allowed_origins_env.split(',') if origin.strip()]
+    allowed_origins.extend(production_origins)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
